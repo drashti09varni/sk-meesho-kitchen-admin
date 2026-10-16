@@ -1,4 +1,6 @@
 (() => {
+  if (window.__storePixelsInstalled) return;
+  window.__storePixelsInstalled = true;
   let configPromise;
   const config = () => configPromise ||= fetch('/api/settings')
     .then(async (response) => {
@@ -23,11 +25,14 @@
       queue.version = '2.0';
       queue.queue = [];
       window._fbq = queue;
+      // Our route listener owns PageView; prevent Meta's parallel SPA listener.
+      queue.disablePushState = true;
       const script = document.createElement('script');
       script.async = true;
       script.src = 'https://connect.facebook.net/en_US/fbevents.js';
       document.head.appendChild(script);
     }
+    window.fbq.disablePushState = true;
     ids.forEach((id) => {
       window.fbq('init', id);
       window.fbq('set', 'autoConfig', false, id);
