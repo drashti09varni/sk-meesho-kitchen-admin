@@ -16,14 +16,22 @@ Never put these credentials in client JavaScript or a public environment variabl
 The session is an eight-hour signed HttpOnly/Secure/SameSite cookie. Password changes
 invalidate prior sessions. Login attempts are limited in Redis. Use HTTPS.
 
-When Redis is first connected, the existing `PAYTM_UPI_ID` and `PAYTM_MID` are
-imported as the initial active profile. This happens server-side, so Vercel Secret
-variables do not need to be downloaded or exposed. The merchant display names still
-come from the existing `PAYTM_MERCHANT_NAME` / `PHONEPE_MERCHANT_NAME` variables.
+When Redis is first connected, the existing `PAYTM_UPI_ID` is imported as the
+initial active profile; `PAYTM_MID` is saved with it when configured. This happens
+server-side, so Vercel Secret variables do not need to be downloaded or exposed.
+The merchant display names still come from the existing `PAYTM_MERCHANT_NAME` /
+`PHONEPE_MERCHANT_NAME` variables.
 
-The panel supports up to **5 unique UPI + matching Paytm MID profiles**, ordered
-with the arrow controls. Add/edit/remove or enable/disable, then Save profiles.
-Use Activate to select a saved enabled profile. Reset failures clears its count.
+A Paytm MID is optional for manually managing and activating UPI profiles. Without
+a matching MID and a supported Paytm merchant integration, payment status remains
+pending and admins must verify payments independently before fulfilling orders.
+Automatic switching is only based on a Paytm gateway-confirmed failure; a UPI ID
+and MID alone do not prove that the gateway can find this website's order reference.
+
+The panel supports up to **5 unique UPI profiles**, optionally paired with their
+matching Paytm MIDs, ordered with the arrow controls. Add/edit/remove or
+enable/disable, then Save profiles. Use Activate to manually select a saved
+enabled profile. Reset failures clears its count.
 Saving stale settings is rejected so another admin or a payment outcome cannot be
 silently overwritten. Refresh status before retrying a stale save.
 
@@ -124,7 +132,8 @@ Copy `.env.example` into your deployment environment and set:
 - `PAYTM_UPI_ID` (required): receiver UPI VPA.
 - `PAYTM_MERCHANT_NAME`: name displayed by Paytm and in the UPI QR.
 - `PHONEPE_MERCHANT_NAME`: name displayed by PhonePe.
-- `PAYTM_MID` (required for tracking): Paytm merchant ID.
+- `PAYTM_MID` (optional for manual UPI switching; needed for Paytm API tracking):
+  Paytm merchant ID.
 - `PAYTM_ENV=test` only when using Paytm staging; omit it for production.
 - `NEXT_PUBLIC_META_PIXEL_ID` and `NEXT_PUBLIC_META_EXTRA_PIXELS` are optional.
 

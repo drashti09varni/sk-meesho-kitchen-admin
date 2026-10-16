@@ -55,7 +55,7 @@
     const label = document.createElement('label');
     label.textContent = title;
     const input = document.createElement('input');
-    input.type = 'text'; input.value = profile[key] || ''; input.required = true;
+    input.type = 'text'; input.value = profile[key] || ''; input.required = key !== 'mid';
     input.placeholder = placeholder; input.autocomplete = 'off';
     input.maxLength = key === 'name' ? 60 : key === 'mid' ? 100 : 193;
     input.addEventListener('input', () => { profile[key] = input.value; changed(); });
@@ -73,7 +73,7 @@
       status.textContent = profile.id === config?.activeId ? 'Active' : !profile.enabled ? 'Disabled' : profile.failures >= 3 ? 'Needs reset' : 'Standby';
       heading.append(title, status);
       const fields = document.createElement('div'); fields.className = 'profile-fields';
-      fields.append(field(profile, 'name', 'Profile name', 'e.g. Merchant 1'), field(profile, 'upi', 'UPI ID', 'merchant@paytm'), field(profile, 'mid', 'Matching merchant MID', 'Your Paytm MID'));
+      fields.append(field(profile, 'name', 'Profile name', 'e.g. Merchant 1'), field(profile, 'upi', 'UPI ID', 'merchant@paytm'), field(profile, 'mid', 'Paytm MID (optional; required for API verification)', 'Your Paytm MID'));
       const footer = document.createElement('div'); footer.className = 'profile-footer';
       const enabledLabel = document.createElement('label');
       const enabled = document.createElement('input'); enabled.type = 'checkbox'; enabled.checked = profile.enabled;
@@ -106,7 +106,7 @@
     });
     if (!draft.length) {
       const empty = document.createElement('p'); empty.className = 'card';
-      empty.textContent = 'No UPI profiles. Add your first UPI ID and its matching MID.'; $('profiles').append(empty);
+      empty.textContent = 'No UPI profiles. Add a UPI ID; add a Paytm MID only if your merchant integration supports API verification.'; $('profiles').append(empty);
     }
     renderButtons();
   }
@@ -116,7 +116,9 @@
     $('save-hint').textContent = 'Changes apply to new orders only.';
     const active = config.profiles.find(p => p.id === config.activeId);
     $('active-name').textContent = active?.name || 'Payments paused';
-    $('active-upi').textContent = active ? `${active.upi} · MID ${active.mid}` : 'Enable and activate a profile to receive new payments.';
+    $('active-upi').textContent = active
+      ? `${active.upi}${active.mid ? ` · MID ${active.mid}` : ' · Manual verification only'}`
+      : 'Enable and activate a profile to receive new payments.';
     $('active-badge').textContent = active ? 'Active' : 'Paused';
     $('active-badge').className = active ? 'badge' : 'badge paused';
     $('activity').replaceChildren();

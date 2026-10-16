@@ -15,7 +15,7 @@
     <section id="login-panel" class="login card">
       <span class="eyebrow">MERCHANT CONTROLS</span>
       <h1>Your payments, in one place.</h1>
-      <p>Manage up to five UPI IDs and their matching merchant MIDs.</p>
+      <p>Manage up to five UPI IDs. A Paytm MID is optional for manual switching; verified automatic switching requires a supported merchant API integration.</p>
       <form id="login-form">
         <label for="password">Payment admin password</label>
         <input id="password" type="password" autocomplete="current-password" required maxlength="1024">
@@ -26,7 +26,7 @@
     <div id="dashboard" hidden>
       <div class="title-row"><div><span class="eyebrow">PAYMENT ROUTING</span><h1>UPI profiles</h1></div><button id="refresh">Refresh status</button></div>
       <section class="summary card"><div><span class="eyebrow">CURRENTLY RECEIVING PAYMENTS</span><h2 id="active-name">—</h2><p id="active-upi"></p></div><span id="active-badge" class="badge">Active</span></section>
-      <p class="rule">After <strong>3 consecutive confirmed failures</strong>, new orders switch to the next enabled profile. Success resets the streak. Pending payments and cancellations do not count. PhonePe confirmation is not tracked by the existing payment flow.</p>
+      <p class="rule">To switch manually, save your profiles and choose <strong>Activate</strong> on the desired enabled profile. After <strong>3 consecutive Paytm gateway-confirmed failures</strong>, new orders switch to the next enabled profile. Success resets the streak. Pending payments and cancellations do not count. Direct UPI payments may not be visible to the gateway API, so those profiles require manual verification and activation. PhonePe confirmation is not tracked by the existing payment flow.</p>
       <form id="profiles-form">
         <div class="section-heading"><h2>Payment profiles <span id="profile-count"></span></h2><button id="add-profile" type="button">+ Add UPI</button></div>
         <div id="profiles"></div>

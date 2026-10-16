@@ -118,3 +118,22 @@ test('verification API validates input and returns immediate confirmed payment',
     else process.env.PAYTM_MID = originalMid;
   }
 });
+
+test('a managed order without a MID never falls back to the global Paytm MID', async () => {
+  const originalMid = process.env.PAYTM_MID;
+  const originalFetch = global.fetch;
+  process.env.PAYTM_MID = 'LEGACYMID';
+  let called = false;
+  global.fetch = async () => { called = true; throw new Error('Should not call Paytm without this order MID'); };
+  try {
+    assert.deepEqual(
+      await checkPaytmStatus('TXNmanual', { mid: '', strict: true }),
+      { status: 'pending' },
+    );
+    assert.equal(called, false);
+  } finally {
+    global.fetch = originalFetch;
+    if (originalMid === undefined) delete process.env.PAYTM_MID;
+    else process.env.PAYTM_MID = originalMid;
+  }
+});

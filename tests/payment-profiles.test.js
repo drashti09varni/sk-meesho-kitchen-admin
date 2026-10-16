@@ -45,12 +45,53 @@ test('server validates max 5, UPI/MID uniqueness and ignores browser-supplied co
   assert.throws(() => routing.validateProfiles(Array(6).fill(profile('valid')), c), /maximum of 5/);
   assert.throws(() => routing.validateProfiles([{ ...profile('valid'), upi: '<script>' }], c), /valid UPI/);
   assert.throws(() => routing.validateProfiles([profile('one'), profile('one')], c), /unique/);
+  const manualProfiles = routing.validateProfiles([
+    { name: 'Manual one', upi: 'manual-one@paytm', mid: '' },
+    { name: 'Manual two', upi: 'manual-two@paytm', mid: '' },
+  ], { profiles: [] });
+  assert.deepEqual(manualProfiles.map(p => p.mid), ['', '']);
   c.profiles[0].failures = 2;
   const saved = routing.validateProfiles([{ ...profile('one'), failures: 0 }], c);
   assert.equal(saved[0].failures, 2);
   const edited = routing.validateProfiles([{ ...profile('one'), mid: 'NEWMID' }], c);
   assert.equal(edited[0].failures, 0);
   assert.equal(edited[0].epoch, 2);
+});
+
+test('initial configuration imports a UPI profile without requiring a Paytm MID', t => {
+  const originalUpi = process.env.PAYTM_UPI_ID;
+  const originalMid = process.env.PAYTM_MID;
+  process.env.PAYTM_UPI_ID = 'manual@paytm';
+  delete process.env.PAYTM_MID;
+  t.after(() => {
+    if (originalUpi === undefined) delete process.env.PAYTM_UPI_ID;
+    else process.env.PAYTM_UPI_ID = originalUpi;
+    if (originalMid === undefined) delete process.env.PAYTM_MID;
+    else process.env.PAYTM_MID = originalMid;
+  });
+
+  const initial = routing.initialConfig();
+  assert.equal(initial.activeId, 'existing-merchant');
+  assert.equal(initial.profiles[0].upi, 'manual@paytm');
+  assert.equal(initial.profiles[0].mid, '');
+});
+
+test('an admin can activate a manual-only profile and route new orders to it', async t => {
+  const db = mockEnvironment(t);
+  const saved = config();
+  saved.profiles[1].mid = '';
+  db.data.set(routing.CONFIG_KEY, JSON.stringify(saved));
+
+  const activated = await routing.updateConfig({
+    action: 'activate',
+    revision: saved.revision,
+    id: 'two',
+  });
+  const order = await routing.assignOrder('TXN9999', 249);
+
+  assert.equal(activated.activeId, 'two');
+  assert.equal(order.upi, 'two@paytm');
+  assert.equal(order.mid, '');
 });
 
 function fakeRedis() {
