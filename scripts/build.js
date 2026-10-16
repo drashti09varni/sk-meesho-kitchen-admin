@@ -13,7 +13,7 @@ for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
 }
 fs.cpSync(path.join(root, 'assets'), path.join(output, 'assets'), { recursive: true });
 // Fail the deployment if an HTML entry point references a missing local asset.
-for (const page of ['index.html', 'success.html', 'failed.html']) {
+for (const page of ['index.html', 'success.html', 'failed.html', 'payment-admin.html']) {
   const html = fs.readFileSync(path.join(output, page), 'utf8');
   for (const match of html.matchAll(/(?:src|href)=["'](\/assets\/[^"']+)["']/g)) {
     const asset = match[1].split(/[?#]/)[0];

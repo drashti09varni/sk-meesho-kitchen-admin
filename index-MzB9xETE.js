@@ -15941,83 +15941,10 @@ function Sm({ products: f, onProductsChange: m }) {
             className: "adm-content",
             children: [
               u.jsxs(_a, {
-                title: "💳 Merchant UPI ID",
+                title: "Payment Management",
                 children: [
-                  u.jsxs("p", {
-                    className: "adm-hint",
-                    children: [
-                      "Customer payments go to this UPI ID. Type the new ID below and press ",
-                      u.jsx("strong", { children: "Save UPI" }),
-                      ".",
-                    ],
-                  }),
-                  u.jsxs("div", {
-                    className: "adm-input-row",
-                    children: [
-                      u.jsx("input", {
-                        className: "adm-input",
-                        type: "text",
-                        value: L,
-                        onChange: (C) => P(C.target.value),
-                        onKeyDown: (C) => C.key === "Enter" && De(),
-                        placeholder: "yourname@upi",
-                      }),
-                      u.jsx("button", {
-                        className: `adm-save-btn ${F ? "adm-saved" : ""}`,
-                        onClick: De,
-                        style: { whiteSpace: "nowrap", minWidth: "88px" },
-                        children: F ? "✓ Saved!" : "Save UPI",
-                      }),
-                    ],
-                  }),
-                  u.jsxs("div", {
-                    style: {
-                      marginTop: "10px",
-                      background: F ? "#f0faf0" : "#fdf7ff",
-                      border: `1.5px solid ${F ? "#86efac" : "#d8b4fe"}`,
-                      borderRadius: "8px",
-                      padding: "10px 12px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    },
-                    children: [
-                      u.jsx("svg", {
-                        width: "16",
-                        height: "16",
-                        viewBox: "0 0 24 24",
-                        fill: F ? "#16a34a" : "#9f2089",
-                        children: u.jsx("path", {
-                          d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
-                        }),
-                      }),
-                      u.jsxs("div", {
-                        children: [
-                          u.jsx("div", {
-                            style: {
-                              fontSize: "10px",
-                              fontWeight: 700,
-                              color: "#888",
-                              textTransform: "uppercase",
-                              letterSpacing: ".4px",
-                            },
-                            children: F
-                              ? "✓ Active in store"
-                              : "Currently active in store",
-                          }),
-                          u.jsx("div", {
-                            style: {
-                              fontSize: "13px",
-                              fontWeight: 700,
-                              color: "#1c1c1c",
-                              wordBreak: "break-all",
-                            },
-                            children: X,
-                          }),
-                        ],
-                      }),
-                    ],
-                  }),
+                  u.jsx("p", { className: "adm-hint", children: "Manage up to 5 UPI + MID profiles, active merchant and automatic failover after 3 consecutive confirmed failures." }),
+                  u.jsx("a", { href: "/admin/payments", className: "adm-save-btn", children: "Open Payment Management →" }),
                 ],
               }),
               u.jsxs(_a, {
@@ -16624,6 +16551,7 @@ Basmati Rice 5KG,299,2499,88% off,https://example.com/rice.jpg,4.3,150,true`,
               children: u.jsx(xl, { size: "lg" }),
             }),
             u.jsx("p", { className: "adm-login-sub", children: "Admin Panel" }),
+            u.jsx("a", { href: "/admin/payments", className: "adm-back-link", children: "UPI and Payment Management →" }),
             u.jsxs("form", {
               onSubmit: (C) => {
                 (C.preventDefault(),

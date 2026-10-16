@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Payment Management</title>
+  <link rel="stylesheet" href="/assets/payment-admin.css?v=1">
+  <script defer src="/assets/payment-admin.js?v=1"></script>
+</head>
+<body>
+  <header><a href="/admin">← Admin</a><strong>Payment Management</strong><button id="logout" hidden>Sign out</button></header>
+  <main>
+    <div id="notice" role="status" aria-live="polite"></div>
+    <section id="login-panel" class="login card">
+      <span class="eyebrow">MERCHANT CONTROLS</span>
+      <h1>Your payments, in one place.</h1>
+      <p>Manage up to five UPI IDs and their matching merchant MIDs.</p>
+      <form id="login-form">
+        <label for="password">Payment admin password</label>
+        <input id="password" type="password" autocomplete="current-password" required maxlength="1024">
+        <button type="submit" class="primary">Sign in</button>
+      </form>
+      <p class="muted">Uses the payment admin password configured in your deployment.</p>
+    </section>
+    <div id="dashboard" hidden>
+      <div class="title-row"><div><span class="eyebrow">PAYMENT ROUTING</span><h1>UPI profiles</h1></div><button id="refresh">Refresh status</button></div>
+      <section class="summary card"><div><span class="eyebrow">CURRENTLY RECEIVING PAYMENTS</span><h2 id="active-name">—</h2><p id="active-upi"></p></div><span id="active-badge" class="badge">Active</span></section>
+      <p class="rule">After <strong>3 consecutive confirmed failures</strong>, new orders switch to the next enabled profile. Success resets the streak. Pending payments and cancellations do not count. PhonePe confirmation is not tracked by the existing payment flow.</p>
+      <form id="profiles-form">
+        <div class="section-heading"><h2>Payment profiles <span id="profile-count"></span></h2><button id="add-profile" type="button">+ Add UPI</button></div>
+        <div id="profiles"></div>
+        <div class="save-bar"><span id="save-hint">Changes apply to new orders only.</span><button class="primary" type="submit">Save profiles</button></div>
+      </form>
+      <section class="card activity"><div class="section-heading"><h2>Recent activity</h2><span class="muted">Last 100 updates</span></div><ol id="activity"></ol></section>
+    </div>
+  </main>
+</body>
+</html>

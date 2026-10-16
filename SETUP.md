@@ -1,5 +1,69 @@
 # Kitchan payment flow setup
 
+## Payment administration and automatic UPI switching
+
+Open `/admin/payments` (also linked from `/admin`). This payment panel has its
+own server-validated login, separate from the older browser-only storefront admin.
+Configure these server-only variables in Vercel Production/Preview and redeploy:
+
+- Connect an Upstash Redis database. Both `UPSTASH_REDIS_REST_URL` +
+  `UPSTASH_REDIS_REST_TOKEN` and Vercel Marketplace's `KV_REST_API_URL` +
+  `KV_REST_API_TOKEN` names are supported. Do not use the read-only token.
+- `PAYMENT_ADMIN_PASSWORD`: at least 12 characters; use a strong random password.
+- `PAYMENT_ADMIN_SESSION_SECRET`: at least 32 random characters.
+
+Never put these credentials in client JavaScript or a public environment variable.
+The session is an eight-hour signed HttpOnly/Secure/SameSite cookie. Password changes
+invalidate prior sessions. Login attempts are limited in Redis. Use HTTPS.
+
+When Redis is first connected, the existing `PAYTM_UPI_ID` and `PAYTM_MID` are
+imported as the initial active profile. This happens server-side, so Vercel Secret
+variables do not need to be downloaded or exposed. The merchant display names still
+come from the existing `PAYTM_MERCHANT_NAME` / `PHONEPE_MERCHANT_NAME` variables.
+
+The panel supports up to **5 unique UPI + matching Paytm MID profiles**, ordered
+with the arrow controls. Add/edit/remove or enable/disable, then Save profiles.
+Use Activate to select a saved enabled profile. Reset failures clears its count.
+Saving stale settings is rejected so another admin or a payment outcome cannot be
+silently overwritten. Refresh status before retrying a stale save.
+
+Routing rules:
+
+- Three **distinct, consecutive gateway-confirmed failures** on the active profile
+  switch new orders to the next enabled profile with fewer than three failures.
+- A confirmed success resets that profile's streak. Outcomes are processed in
+  confirmation order, not order-creation order.
+- Pending/not-found statuses, API/network timeouts, modal cancellation and browser
+  navigation do not count as failures. The existing PhonePe flow does not verify
+  transactions, so PhonePe failures cannot contribute to automatic switching.
+- Repeated/concurrent verify requests count an order at most once. Terminal states
+  are cached in Redis. Settings and outcomes use atomic Redis compare-and-set.
+- Exhausted profiles are skipped. If no eligible profile remains, new payments pause
+  until an administrator resets/activates a profile. The panel shows this state.
+- Each new order stores its own UPI/MID/amount and profile epoch. Rotation, credential
+  edits, deletion, or manual reactivation cannot move an existing order to a different
+  MID. Old epochs do not affect freshly reset counters.
+- References are retained for 30 days; recent activity is capped at 100 updates.
+  Expired managed references return not-found, rather than being checked on another
+  MID. This is a routing/activity ledger, not long-term financial accounting storage.
+
+The same `/api/initiate-payment` and `/api/verify-payment` routes and response
+fields remain in use. With Redis unconfigured the original environment-based flow
+continues; with Redis configured, database errors fail safely instead of silently
+changing merchant. Pre-migration short transaction IDs still verify using the
+original environment MID. Keep `PAYTM_MID` set for those old orders.
+
+Use the Upstash **Free** plan with `autoUpgrade=false` and `eviction=false` if you
+want no automatic paid upgrades and no silent eviction of order records. Monitor
+the free quota; reaching a quota/database outage can temporarily stop managed
+checkout. Production and Preview should use separate databases for isolated
+testing; never generate fake payment outcomes against the production routing keys.
+
+Verification: `npm test` includes profile validation, failure streak/reset,
+1 → 2 → 3 rotation, all-profiles-exhausted behavior, idempotency/concurrency,
+MID snapshots, initiation/verification compatibility, and admin authentication.
+Gateway outcomes in those tests are mocked; no real payment is initiated.
+
 ## Deploying this prebuilt archive
 
 Deploy the complete project directory containing `vercel.json`, `package.json`,

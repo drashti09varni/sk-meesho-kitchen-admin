@@ -6,6 +6,7 @@ const {
   buildPaytmIntent,
   buildPhonepeIntent,
 } = require('../lib/payment');
+const profiles = require('../lib/payment-profiles');
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
@@ -13,10 +14,10 @@ module.exports = async (req, res) => {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
-  const upiId = process.env.PAYTM_UPI_ID;
+  let upiId = process.env.PAYTM_UPI_ID;
   const merchantName = process.env.PAYTM_MERCHANT_NAME || 'Store';
   const phonepeMerchantName = process.env.PHONEPE_MERCHANT_NAME || merchantName;
-  if (!upiId) {
+  if (!upiId && !profiles.configured()) {
     return res.status(500).json({
       success: false,
       error: 'No UPI configured — set PAYTM_UPI_ID',
@@ -32,6 +33,10 @@ module.exports = async (req, res) => {
 
   try {
     const txnid = generateOrderId();
+    if (profiles.configured()) {
+      const order = await profiles.assignOrder(txnid, cart.amount);
+      upiId = order.upi;
+    }
     const upiUrl = buildUpiUrl(cart.amount, txnid, upiId, merchantName);
     return res.status(200).json({
       success: true,
