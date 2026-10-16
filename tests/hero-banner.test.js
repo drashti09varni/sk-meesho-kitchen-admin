@@ -62,5 +62,5 @@ test("hero banner is a full-HD-width asset in the old banner ratio", () => {
 
 test("the page cache-busts the updated home bundle", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
-  assert.match(html, /index-MzB9xETE\.js\?v=14/);
+  assert.match(html, /index-MzB9xETE\.js\?v=15/);
 });

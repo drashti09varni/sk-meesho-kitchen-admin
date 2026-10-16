@@ -13676,6 +13676,51 @@ const gs = [
   am = (f) => (f >= 4 ? "#059669" : f === 3 ? "#d97706" : "#ef4444"),
   nm = {},
   im = "Explore practical essentials for your home and kitchen.";
+function SuggestedProducts({ products, currentId, onAddToCart, onView }) {
+  const slider = q.useRef(null);
+  const suggestions = products.filter(product =>
+    String(product.id) !== String(currentId) && !product.hidden &&
+    String(product.id) !== "900001" &&
+    String(product.slug || "").toLowerCase() !== "dx" &&
+    !["dx", "payment testing product"].includes(String(product.name || "").trim().toLowerCase())
+  ).slice(0, 12);
+  if (!suggestions.length) return null;
+  const scroll = direction => {
+    const track = slider.current;
+    if (track) track.scrollBy({ left: direction * track.clientWidth * 0.85, behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  };
+  return u.jsxs("section", {
+    className: "suggested-products",
+    "aria-label": "Suggested products",
+    children: [
+      u.jsxs("div", {
+        className: "suggested-products-heading",
+        children: [
+          u.jsx("h2", { className: "card-title", children: "Suggested Products" }),
+          u.jsxs("div", {
+            className: "suggested-products-controls",
+            children: [
+              u.jsx("button", { type: "button", "aria-label": "Previous suggested products", onClick: () => scroll(-1), children: "‹" }),
+              u.jsx("button", { type: "button", "aria-label": "Next suggested products", onClick: () => scroll(1), children: "›" })
+            ]
+          })
+        ]
+      }),
+      u.jsx("div", {
+        className: "suggested-products-track",
+        ref: slider,
+        tabIndex: 0,
+        role: "region",
+        "aria-label": "Swipe or scroll to browse suggested products",
+        children: suggestions.map(product => u.jsx(em, {
+          product,
+          onAddToCart,
+          onView: () => onView(product.id)
+        }, product.id))
+      })
+    ]
+  });
+}
 function productDescription(product) {
   const name=product.name || 'Home and kitchen essential';
   const text=name.toLowerCase();
@@ -13973,6 +14018,12 @@ function um({
                 ),
               }),
             ],
+          }),
+          u.jsx(SuggestedProducts, {
+            products: f,
+            currentId: O.id,
+            onAddToCart: (product) => { D(product); L("Added to cart!"); },
+            onView: (id) => A(`/product/${id}`),
           }),
           u.jsxs("div", {
             className: "new-reviews-container",

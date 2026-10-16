@@ -20,5 +20,5 @@ test("product cards keep their footer rows aligned", () => {
 test("the page loads the product-card alignment stylesheet", () => {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
-  assert.match(html, /assets\/product-card-layout\.css\?v=1/);
+  assert.match(html, /assets\/product-card-layout\.css\?v=2/);
 });
