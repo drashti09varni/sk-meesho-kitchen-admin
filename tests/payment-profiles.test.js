@@ -148,6 +148,33 @@ test('managed gateway verification rejects wrong MID/order and wrong success amo
   }
 });
 
+test('live Paytm 334 response is an integration warning, never a counted failure', async t => {
+  const db = mockEnvironment(t);
+  db.data.set(routing.CONFIG_KEY, JSON.stringify(config()));
+  await routing.assignOrder('TXN334', 249);
+  global.fetch = async (url, opts) => url === 'https://redis.example' ? db.fetch(url, opts) : {
+    json: async () => ({ STATUS: 'TXN_FAILURE', RESPCODE: '334', RESPMSG: 'Invalid Order Id.', MID: 'MIDone', ORDERID: 'TXN334', TXNID: '' }),
+  };
+  const verify = require('../api/verify-payment');
+  const call = async () => {
+    const res = { code: 200, setHeader() {}, status(c) { this.code=c; return this; }, json(data) { this.data=data; return this; } };
+    await verify({ method:'POST', body:{txnid:'TXN334'} },res);
+    return res;
+  };
+  const result = await call();
+  assert.equal(result.data.status,'pending');
+  assert.equal(result.data.verification.state,'order_not_found');
+  assert.equal(result.data.verification.code,'334');
+  await call();
+  const saved = await routing.getConfig();
+  assert.equal(saved.profiles[0].failures,0);
+  assert.equal(saved.activeId,'one');
+  assert.equal(saved.events.filter(e=>e.type==='verification_issue').length,1);
+  assert.equal((await routing.getOrder('TXN334')).status,'pending');
+  assert.equal(saved.profiles[0].lastVerification.state,'order_not_found');
+  assert.equal(routing.validateProfiles(saved.profiles,saved)[0].lastVerification.state,'order_not_found');
+});
+
 test('payment admin requires server session and CSRF header; cookie tampering fails', async t => {
   mockEnvironment(t);
   const call = async req => {

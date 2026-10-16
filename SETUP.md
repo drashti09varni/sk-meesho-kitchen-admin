@@ -36,6 +36,15 @@ Routing rules:
 - Pending/not-found statuses, API/network timeouts, modal cancellation and browser
   navigation do not count as failures. The existing PhonePe flow does not verify
   transactions, so PhonePe failures cannot contribute to automatic switching.
+- Paytm response `334 / Invalid Order Id` is shown as a verification issue in the
+  admin panel and is never counted as a confirmed failed payment. The current
+  inherited direct UPI links/QR do not register a Paytm gateway order. A payment
+  entry visible in a merchant dashboard is not proof that this generated website
+  order ID can be queried through Paytm's gateway Order Status API. Reliable live
+  switching requires a supported merchant integration that registers/reconciles
+  the same order reference (or authenticated provider notifications). A UPI ID and
+  MID alone do not establish that compatibility. Test coverage of mocked gateway
+  responses does not verify a merchant's live integration.
 - Repeated/concurrent verify requests count an order at most once. Terminal states
   are cached in Redis. Settings and outcomes use atomic Redis compare-and-set.
 - Exhausted profiles are skipped. If no eligible profile remains, new payments pause

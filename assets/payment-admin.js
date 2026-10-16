@@ -95,7 +95,14 @@
       if (index < draft.length - 1) footer.append(button('↓', () => { [draft[index + 1], draft[index]] = [draft[index], draft[index + 1]]; changed(); renderProfiles(); }, 'Move profile later'));
       const remove = button('Remove', () => { draft.splice(index, 1); changed(); renderProfiles(); });
       remove.className = 'danger'; footer.append(remove);
-      card.append(heading, fields, footer); $('profiles').append(card);
+      card.append(heading, fields, footer);
+      if (profile.lastVerification) {
+        const warning = document.createElement('p');
+        warning.className = 'verification-warning';
+        warning.textContent = `Verification issue (${profile.lastVerification.code}): ${profile.lastVerification.message}`;
+        card.append(warning);
+      }
+      $('profiles').append(card);
     });
     if (!draft.length) {
       const empty = document.createElement('p'); empty.className = 'card';
@@ -118,7 +125,7 @@
       const name = config.profiles.find(p => p.id === (event.profileId || event.from))?.name || 'Merchant';
       const target = config.profiles.find(p => p.id === event.to)?.name;
       const description = event.type === 'rotation' ? `${name}: ${event.message}${target ? ` → ${target}` : ''}` :
-        event.type === 'settings' ? 'Payment profiles updated' : `${name}: ${event.type}${event.transactionId ? ` · ${event.transactionId}` : ''}`;
+        event.type === 'settings' ? 'Payment profiles updated' : event.type === 'verification_issue' ? `${name}: ${event.message}` : `${name}: ${event.type}${event.transactionId ? ` · ${event.transactionId}` : ''}`;
       item.textContent = `${new Date(event.at).toLocaleString()} — ${description}`;
       $('activity').append(item);
     }

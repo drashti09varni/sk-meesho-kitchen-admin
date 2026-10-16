@@ -29,6 +29,10 @@ module.exports = async (req, res) => {
       // Existing pre-migration orders continue to use the original environment MID.
       // New orders always use their saved merchant, even after a rotation/edit.
       const result = await checkPaytmStatus(txnid, order ? { mid: order.mid, amount: order.amount, strict: true } : {});
+      if (order && result.verification) {
+        await profiles.recordVerificationIssue(txnid, result.verification);
+        return res.status(200).json({ success: true, status: 'pending', verification: result.verification });
+      }
       if (result.status === 'success' || result.status === 'failure') {
         const saved = order ? await profiles.recordOutcome(txnid, result) : null;
         return res.status(200).json({
