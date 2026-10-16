@@ -1,0 +1,15 @@
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#f6f7fb;color:#222;font-family:Arial,sans-serif}
+.confirmation-container{display:flex;justify-content:center;align-items:center;width:100%;min-height:100vh;padding:20px}
+.confirmation-box{background:#fff;padding:24px 30px;border-radius:8px;box-shadow:0 0 15px rgba(0,0,0,.1);text-align:center;max-width:400px;width:100%}
+.confirmation-message{font-size:16px;color:#666;margin:18px 0 20px;line-height:1.5}
+.transaction-details{text-align:left;margin-bottom:20px;overflow-wrap:anywhere}
+.transaction-details p{font-size:14px;color:#333;margin:8px 0}
+.confirmation-button{display:inline-block;padding:11px 20px;background:#4caf50;color:#fff;border-radius:4px;text-decoration:none;font-size:16px;border:0;cursor:pointer}
+.confirmation-button:hover{background:#45a049}
+.confirmation-button.failed{background:#d32f2f}
+.loading-spinner{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.spinner{width:52px;height:52px;border:7px solid #ddd;border-top-color:#333;border-radius:50%;animation:confirmation-spin 1s linear infinite}
+[hidden]{display:none!important}
+@keyframes confirmation-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.spinner{animation:none}}

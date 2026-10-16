@@ -1,5 +1,34 @@
 # Kitchan payment flow setup
 
+## Deploying this prebuilt archive
+
+Deploy the complete project directory containing `vercel.json`, `package.json`,
+`api/`, `lib/`, and `assets/`. Set the Vercel Root Directory to that directory.
+The checked-in configuration selects Other (no framework), runs `npm run build`,
+and publishes `public/`. The build copies the existing compiled storefront and
+validates its local script/style references; no Vite source compilation is needed.
+Keep `api/` at the project root so Vercel can deploy its Node functions. Do not
+deploy only `public/` for a working checkout.
+
+Static files and functions resolve before SPA navigation. Missing `/assets/*`,
+`/api/*`, and file-like paths return 404 rather than `index.html`. Routes such as
+`/payment`, `/checkout`, and `/product/1` still load the SPA. Root-relative URLs
+assume deployment at the domain root, not under a subdirectory.
+
+After deploying, check these URLs on your own deployment:
+
+- `/assets/index-MzB9xETE.js?v=14`
+- `/assets/store-pixels.js?v=8`
+- `/assets/cashfree-checkout.js?v=21`
+
+Each must return 200 with JavaScript content, not HTML. A made-up asset such as
+`/assets/missing.js` must return 404. Check `/api/settings` returns JSON, and verify
+checkout with your configured merchant test environment. If requests still return
+HTML, confirm the new deployment is active and check any external proxy/rewrite.
+
+Despite its filename, `cashfree-checkout.js` implements this project's existing
+PhonePe/Paytm/QR flow, not the Cashfree SDK.
+
 The old MongoDB receipt-ledger payment implementation has been removed. This
 store now uses the same flow as `Kitchan`:
 

@@ -1,6 +1,11 @@
 {
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "public",
   "routes": [
     { "handle": "filesystem" },
+    { "src": "/(?:assets|api)(?:/.*)?", "status": 404 },
+    { "src": "/.*\\.[^/]+$", "status": 404 },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

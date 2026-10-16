@@ -1,0 +1,17 @@
+/* Keep product-card footers aligned when titles and prices wrap differently. */
+.product-list {
+  align-items: stretch;
+}
+
+.product-card {
+  height: 100%;
+}
+
+.product-details {
+  flex: 1;
+}
+
+.ratings-row {
+  margin-top: auto;
+  padding-top: 2px;
+}
