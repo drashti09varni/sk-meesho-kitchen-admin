@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Payment Failed</title>
+    <link rel="stylesheet" href="/assets/payment-confirmation.css?v=1">
+    <script defer src="/assets/store-pixels.js?v=8"></script>
+    <script defer src="/assets/payment-failed.js?v=1"></script>
+  </head>
+  <body>
+    <div id="loading" class="loading-spinner"><span class="spinner" aria-label="Loading"></span></div>
+    <main id="failed-card" class="confirmation-container" hidden>
+      <section class="confirmation-box">
+        <svg xmlns="http://www.w3.org/2000/svg" height="100" width="100" viewBox="0 0 48 48" aria-hidden="true">
+          <circle fill="#f00" cx="24" cy="24" r="22" />
+          <path fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" d="M16 16L32 32M32 16L16 32" />
+        </svg>
+        <p class="confirmation-message">We regret to inform you that your payment has failed. Please try again.</p>
+        <div class="transaction-details">
+          <p><strong>Transaction ID:</strong> <span id="transaction-id"></span></p>
+          <p><strong>Amount:</strong> <span id="amount"></span></p>
+          <p><strong>Paid Status:</strong> <span id="status"></span></p>
+          <p><strong>Date:</strong> <span id="date"></span></p>
+        </div>
+        <a href="/payment" class="confirmation-button failed">Try again</a>
+      </section>
+    </main>
+  </body>
+</html>
